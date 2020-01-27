@@ -45,7 +45,7 @@ Sharpstay.exe action=ElevatedUserInitKey command="C:\Windows\temp\fun.exe"
 ```
 
 ```
-Sharpstay.exe action=ScheduledTask 
+Sharpstay.exe action=ScheduledTask taskname=TestTask command="C:\windows\temp\file.exe" runasuser=user1 triggertype=logon author=Microsoft Corp. description="Test Task" logonuser=user1
 ```
 
 ```
