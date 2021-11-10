@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Xml;
 using System.Linq;
@@ -199,7 +199,7 @@ namespace SharpStay
         }
 
         // Scheduled Task Items
-        static void CreateScheduledTask(string taskName, string command, string runasuser, string triggertype, string author, string description, string rep, string attime, string startat, string logonuser)
+        static void CreateScheduledTask(string taskName, string command, string runasuser, string triggertype, string author, string description, string rep, string attime, string startat, string logonuser, int expire)
         {
             List<string> retcmd = ParseCommand(command);
             string Directory = retcmd[0];
@@ -238,6 +238,12 @@ namespace SharpStay
                 trigger.Repetition.Interval = repetition;
                 trigger.StartBoundary = sbound;
                 //trigger.EndBoundary = "2020-01-31T12:00:00";
+                if(expire != -1)
+                {
+                    DateTime currentDateTime = DateTime.Now;
+                    DateTime expireTime = currentDateTime.AddDays(expire);
+                    trigger.EndBoundary = String.Format(expireTime.ToString("yyyy-MM-dd" + "T12:00:00"));
+                }
             }
             else if (triggertype.ToLower() == "daily")
             {
@@ -245,7 +251,12 @@ namespace SharpStay
                 trigger.Id = "DailyTrigger";
                 //trigger.Repetition.Interval = "PT2M";
                 trigger.StartBoundary = sbound;
-                //trigger.EndBoundary = "2020-01-31T12:00:00";
+                if (expire != -1)
+                {
+                    DateTime currentDateTime = DateTime.Now;
+                    DateTime expireTime = currentDateTime.AddDays(expire);
+                    trigger.EndBoundary = String.Format(expireTime.ToString("yyyy-MM-dd" + "T12:00:00"));
+                }
             }
             else if (triggertype.ToLower() == "weekly")
             {
@@ -256,6 +267,12 @@ namespace SharpStay
                 // By default Monday-Friday
                 trigger.DaysOfWeek = 62;
                 trigger.WeeksInterval = 1;
+                if (expire != -1)
+                {
+                    DateTime currentDateTime = DateTime.Now;
+                    DateTime expireTime = currentDateTime.AddDays(expire);
+                    trigger.EndBoundary = String.Format(expireTime.ToString("yyyy-MM-dd" + "T12:00:00"));
+                }
             }
             else if (triggertype.ToLower() == "monthly")
             {
@@ -267,6 +284,12 @@ namespace SharpStay
                 // By default 1st and 15th
                 trigger.DaysOfMonth = 16385;
                 //trigger.MonthsOfYear = 4095;
+                if (expire != -1)
+                {
+                    DateTime currentDateTime = DateTime.Now;
+                    DateTime expireTime = currentDateTime.AddDays(expire);
+                    trigger.EndBoundary = String.Format(expireTime.ToString("yyyy-MM-dd" + "T12:00:00"));
+                }
             }
             else if (triggertype.ToLower() == "idle")
             {
@@ -1268,6 +1291,7 @@ namespace SharpStay
                     string attime = "10:00:00";
                     string startat = "2017-07-01";
                     string rep = null;
+                    int expire = -1;
                     if (arguments.ContainsKey("cleanup") && !arguments.ContainsKey("taskname"))
                     {
                         HowTo();
@@ -1306,7 +1330,11 @@ namespace SharpStay
                     {
                         startat = arguments["logonuser"];
                     }
-                    CreateScheduledTask(taskname, arguments["command"], runasuser, arguments["triggertype"], author, description, rep, attime, startat, logonuser);
+                    if (arguments.ContainsKey("expire"))
+                    {
+                        expire = Int32.Parse(arguments["expire"]);
+                    }
+                    CreateScheduledTask(taskname, arguments["command"], runasuser, arguments["triggertype"], author, description, rep, attime, startat, logonuser, expire);
                 }
             }
             else if (arguments["action"].ToLower() == "listscheduledtasks")
