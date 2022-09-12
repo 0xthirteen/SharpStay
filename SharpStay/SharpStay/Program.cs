@@ -1108,429 +1108,437 @@ namespace SharpStay
                 return;
             }
 
-            var arguments = new Dictionary<string, string>();
-            foreach (string argument in args)
+            try
             {
-                int idx = argument.IndexOf('=');
-                if (idx > 0)
-                    arguments[argument.Substring(0, idx)] = argument.Substring(idx + 1);
-            }
-
-            if (!arguments.ContainsKey("action"))
-            {
-                HowTo();
-                return;
-            }
-            if (arguments["action"].ToLower() == "elevatedwmiregistry")
-            {
-                if (!arguments.ContainsKey("command") || !arguments.ContainsKey("keyname"))
+                var arguments = new Dictionary<string, string>();
+                foreach (string argument in args)
                 {
-                    HowTo();
-                    return;
-                }
-                else
-                {
-                    string keyname = arguments["keyname"];
-                    string command = arguments["command"];
-                    WMIElevatedRunKey(keyname, command);
+                    int idx = argument.IndexOf('=');
+                    if (idx > 0)
+                        arguments[argument.Substring(0, idx)] = argument.Substring(idx + 1);
                 }
 
-            }
-            else if (arguments["action"].ToLower() == "elevatedregistrykey")
-            {
-                if (arguments.ContainsKey("cleanup") && !arguments.ContainsKey("keyname"))
+                if (!arguments.ContainsKey("action"))
                 {
                     HowTo();
                     return;
                 }
-                else if (!arguments.ContainsKey("keyname") || !arguments.ContainsKey("command") && !arguments.ContainsKey("cleanup"))
+                if (arguments["action"].ToLower() == "elevatedwmiregistry")
                 {
-                    HowTo();
-                    return;
-                }
-                else
-                {
-                    bool cleanup = false;
-                    string keypath = "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
-                    string keyname = arguments["keyname"];
-                    string command = "";
-                    if (arguments.ContainsKey("cleanup"))
-                    {
-                        cleanup = true;
-                    }
-                    if (arguments.ContainsKey("command"))
-                    {
-                        command = arguments["command"];
-                    }
-                    if (arguments.ContainsKey("keypath"))
-                    {
-                        keypath = arguments["keypath"];
-                    }
-                    ElevatedRegistryKey(keyname, command, keypath, cleanup);
-                }
-            }
-            else if (arguments["action"].ToLower() == "userregistrykey")
-            {
-                if (arguments.ContainsKey("cleanup") && !arguments.ContainsKey("keyname"))
-                {
-                    HowTo();
-                    return;
-                }
-                else if (!arguments.ContainsKey("keyname") || !arguments.ContainsKey("command") && !arguments.ContainsKey("cleanup"))
-                {
-                    HowTo();
-                    return;
-                }
-                else
-                {
-                    bool cleanup = false;
-                    string keypath = "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
-                    string keyname = arguments["keyname"];
-                    string command = "";
-                    if (arguments.ContainsKey("cleanup"))
-                    {
-                        cleanup = true;
-                    }
-                    if (arguments.ContainsKey("command"))
-                    {
-                        command = arguments["command"];
-                    }
-                    if (arguments.ContainsKey("keypath"))
-                    {
-                        keypath = arguments["keypath"];
-                    }
-                    UserRegistryKey(keyname, command, keypath, cleanup);
-                }
-            }
-            else if (arguments["action"].ToLower() == "userinitmprlogonscriptkey")
-            {
-                if (!arguments.ContainsKey("command") && !arguments.ContainsKey("cleanup"))
-                {
-                    HowTo();
-                    return;
-                }
-                else
-                {
-                    bool cleanup = false;
-                    string command = "";
-                    if (arguments.ContainsKey("command"))
-                    {
-                        command = arguments["command"];
-                    }
-                    if (arguments.ContainsKey("cleanup"))
-                    {
-                        cleanup = true;
-                    }
-                    UserInitMprLogonScriptKey(command, cleanup);
-                }
-
-            }
-            else if (arguments["action"].ToLower() == "elevateduserinitkey")
-            {
-                if (!arguments.ContainsKey("command") && !arguments.ContainsKey("cleanup"))
-                {
-                    HowTo();
-                    return;
-                }
-                else
-                {
-                    string command = "";
-                    bool cleanup = false;
-                    if (arguments.ContainsKey("command"))
-                    {
-                        command = arguments["command"];
-                    }
-                    if (arguments.ContainsKey("cleanup"))
-                    {
-                        cleanup = true;
-                    }
-                    ElevatedRegistryUserInitKey(command, cleanup);
-                }
-            }
-            else if (arguments["action"].ToLower() == "scheduledtask")
-            {
-                // Maybe allow modifcation to days of week, days on month and months of year
-                string taskname = "DebugTask";
-                if (arguments.ContainsKey("taskname"))
-                {
-                    taskname = arguments["taskname"];
-                }
-                if (arguments.ContainsKey("cleanup"))
-                {
-                    DeleteScheduledTask(taskname);
-                }
-                else
-                {
-                    string runasuser = "SYSTEM";
-                    string logonuser = Environment.UserName;
-                    string author = "Microsoft Corporation";
-                    string description = "Microsoft Task";
-                    string attime = "10:00:00";
-                    string startat = "2017-07-01";
-                    string rep = null;
-                    if (arguments.ContainsKey("cleanup") && !arguments.ContainsKey("taskname"))
+                    if (!arguments.ContainsKey("command") || !arguments.ContainsKey("keyname"))
                     {
                         HowTo();
                         return;
                     }
-                    if (arguments.ContainsKey("runasuser"))
+                    else
                     {
-                        runasuser = arguments["runasuser"];
+                        string keyname = arguments["keyname"];
+                        string command = arguments["command"];
+                        WMIElevatedRunKey(keyname, command);
                     }
-                    if (!arguments.ContainsKey("triggertype") || !arguments.ContainsKey("command"))
+
+                }
+                else if (arguments["action"].ToLower() == "elevatedregistrykey")
+                {
+                    if (arguments.ContainsKey("cleanup") && !arguments.ContainsKey("keyname"))
                     {
                         HowTo();
                         return;
                     }
-                    if (arguments.ContainsKey("author"))
-                    {
-                        author = arguments["author"];
-                    }
-                    if (arguments.ContainsKey("description"))
-                    {
-                        description = arguments["description"];
-                    }
-                    if (arguments.ContainsKey("rep"))
-                    {
-                        rep = arguments["rep"];
-                    }
-                    if (arguments.ContainsKey("attime"))
-                    {
-                        attime = arguments["attime"];
-                    }
-                    if (arguments.ContainsKey("startat"))
-                    {
-                        startat = arguments["startat"];
-                    }
-                    if (arguments.ContainsKey("logonuser"))
-                    {
-                        startat = arguments["logonuser"];
-                    }
-                    CreateScheduledTask(taskname, arguments["command"], runasuser, arguments["triggertype"], author, description, rep, attime, startat, logonuser);
-                }
-            }
-            else if (arguments["action"].ToLower() == "listscheduledtasks")
-            {
-                ListScheduledTasks();
-            }
-            else if (arguments["action"].ToLower() == "scheduledtaskaction")
-            {
-                string sfolder = string.Empty;
-                string actionid = string.Empty;
-                bool cleanup = false;
-                if (!arguments.ContainsKey("taskname") || !arguments.ContainsKey("command"))
-                {
-                    HowTo();
-                    return;
-                }
-                else
-                {
-                    string taskname = arguments["taskname"];
-                    string command = arguments["command"];
-                    if (arguments.ContainsKey("folder"))
-                    {
-                        sfolder = arguments["folder"];
-                    }
-                    if (arguments.ContainsKey("actionid"))
-                    {
-                        actionid = arguments["actionid"];
-                    }
-                    if (arguments.ContainsKey("cleanup"))
-                    {
-                        cleanup = true;
-                    }
-                    AddScheduledTaskAction(taskname, command, sfolder, actionid, cleanup);
-                }
-            }
-            else if (arguments["action"].ToLower() == "schtaskcomhijack")
-            {
-                if (arguments.ContainsKey("cleanup") && !arguments.ContainsKey("clsid"))
-                {
-                    HowTo();
-                    return;
-                }
-                if (!arguments.ContainsKey("clsid") || !arguments.ContainsKey("dllpath") && !arguments.ContainsKey("cleanup"))
-                {
-                    HowTo();
-                    return;
-                }
-                else
-                {
-                    string clsid = arguments["clsid"];
-                    string dllpath = string.Empty;
-                    bool cleanup = false;
-                    if (arguments.ContainsKey("dllpath"))
-                    {
-                        dllpath = arguments["dllpath"];
-                    }
-                    if (arguments.ContainsKey("cleanup"))
-                    {
-                        cleanup = true;
-                    }
-                    SchTskCOMHijack(clsid, dllpath, cleanup);
-                }
-            }
-            else if (arguments["action"].ToLower() == "createservice")
-            {
-                string servicename = "WinSvc32";
-                if (arguments.ContainsKey("servicename"))
-                {
-                    servicename = arguments["servicename"];
-                }
-
-                if (arguments.ContainsKey("cleanup"))
-                {
-                    DeleteService(servicename);
-                }
-                else
-                {
-                    if (!arguments.ContainsKey("command"))
+                    else if (!arguments.ContainsKey("keyname") || !arguments.ContainsKey("command") && !arguments.ContainsKey("cleanup"))
                     {
                         HowTo();
                         return;
                     }
-                    string command = arguments["command"];
-                    CreateService(servicename, command);
-                }
-
-            }
-            else if (arguments["action"].ToLower() == "listrunningservices")
-            {
-                ListRunningServices();
-            }
-            else if (arguments["action"].ToLower() == "wmieventsub")
-            {
-                string eventname = "WinEvent";
-                string attime = "10:00";
-                string command = "";
-                bool cleanup = false;
-                if (arguments.ContainsKey("cleanup") && !arguments.ContainsKey("eventname"))
-                {
-                    HowTo();
-                    return;
-                }
-                else if (!arguments.ContainsKey("eventname") || !arguments.ContainsKey("command") && !arguments.ContainsKey("cleanup"))
-                {
-                    HowTo();
-                    return;
-                }
-                else
-                {
-                    if (arguments.ContainsKey("cleanup"))
+                    else
                     {
-                        cleanup = true;
-                    }
-                    if (arguments.ContainsKey("eventname"))
-                    {
-                        eventname = arguments["eventname"];
-                    }
-                    if (arguments.ContainsKey("attime"))
-                    {
-                        if (arguments["attime"] == "startup" || arguments["attime"].Contains(":"))
+                        bool cleanup = false;
+                        string keypath = "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
+                        string keyname = arguments["keyname"];
+                        string command = "";
+                        if (arguments.ContainsKey("cleanup"))
                         {
-                            attime = arguments["attime"];
+                            cleanup = true;
                         }
-                        else
+                        if (arguments.ContainsKey("command"))
                         {
-                            Console.WriteLine("[-] Invalid 'attime', accepts 'startup' or time as '10:00'");
+                            command = arguments["command"];
+                        }
+                        if (arguments.ContainsKey("keypath"))
+                        {
+                            keypath = arguments["keypath"];
+                        }
+                        ElevatedRegistryKey(keyname, command, keypath, cleanup);
+                    }
+                }
+                else if (arguments["action"].ToLower() == "userregistrykey")
+                {
+                    if (arguments.ContainsKey("cleanup") && !arguments.ContainsKey("keyname"))
+                    {
+                        HowTo();
+                        return;
+                    }
+                    else if (!arguments.ContainsKey("keyname") || !arguments.ContainsKey("command") && !arguments.ContainsKey("cleanup"))
+                    {
+                        HowTo();
+                        return;
+                    }
+                    else
+                    {
+                        bool cleanup = false;
+                        string keypath = "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
+                        string keyname = arguments["keyname"];
+                        string command = "";
+                        if (arguments.ContainsKey("cleanup"))
+                        {
+                            cleanup = true;
+                        }
+                        if (arguments.ContainsKey("command"))
+                        {
+                            command = arguments["command"];
+                        }
+                        if (arguments.ContainsKey("keypath"))
+                        {
+                            keypath = arguments["keypath"];
+                        }
+                        UserRegistryKey(keyname, command, keypath, cleanup);
+                    }
+                }
+                else if (arguments["action"].ToLower() == "userinitmprlogonscriptkey")
+                {
+                    if (!arguments.ContainsKey("command") && !arguments.ContainsKey("cleanup"))
+                    {
+                        HowTo();
+                        return;
+                    }
+                    else
+                    {
+                        bool cleanup = false;
+                        string command = "";
+                        if (arguments.ContainsKey("command"))
+                        {
+                            command = arguments["command"];
+                        }
+                        if (arguments.ContainsKey("cleanup"))
+                        {
+                            cleanup = true;
+                        }
+                        UserInitMprLogonScriptKey(command, cleanup);
+                    }
+
+                }
+                else if (arguments["action"].ToLower() == "elevateduserinitkey")
+                {
+                    if (!arguments.ContainsKey("command") && !arguments.ContainsKey("cleanup"))
+                    {
+                        HowTo();
+                        return;
+                    }
+                    else
+                    {
+                        string command = "";
+                        bool cleanup = false;
+                        if (arguments.ContainsKey("command"))
+                        {
+                            command = arguments["command"];
+                        }
+                        if (arguments.ContainsKey("cleanup"))
+                        {
+                            cleanup = true;
+                        }
+                        ElevatedRegistryUserInitKey(command, cleanup);
+                    }
+                }
+                else if (arguments["action"].ToLower() == "scheduledtask")
+                {
+                    // Maybe allow modifcation to days of week, days on month and months of year
+                    string taskname = "DebugTask";
+                    if (arguments.ContainsKey("taskname"))
+                    {
+                        taskname = arguments["taskname"];
+                    }
+                    if (arguments.ContainsKey("cleanup"))
+                    {
+                        DeleteScheduledTask(taskname);
+                    }
+                    else
+                    {
+                        string runasuser = "SYSTEM";
+                        string logonuser = Environment.UserName;
+                        string author = "Microsoft Corporation";
+                        string description = "Microsoft Task";
+                        string attime = "10:00:00";
+                        string startat = "2017-07-01";
+                        string rep = null;
+                        if (arguments.ContainsKey("cleanup") && !arguments.ContainsKey("taskname"))
+                        {
                             HowTo();
                             return;
                         }
+                        if (arguments.ContainsKey("runasuser"))
+                        {
+                            runasuser = arguments["runasuser"];
+                        }
+                        if (!arguments.ContainsKey("triggertype") || !arguments.ContainsKey("command"))
+                        {
+                            HowTo();
+                            return;
+                        }
+                        if (arguments.ContainsKey("author"))
+                        {
+                            author = arguments["author"];
+                        }
+                        if (arguments.ContainsKey("description"))
+                        {
+                            description = arguments["description"];
+                        }
+                        if (arguments.ContainsKey("rep"))
+                        {
+                            rep = arguments["rep"];
+                        }
+                        if (arguments.ContainsKey("attime"))
+                        {
+                            attime = arguments["attime"];
+                        }
+                        if (arguments.ContainsKey("startat"))
+                        {
+                            startat = arguments["startat"];
+                        }
+                        if (arguments.ContainsKey("logonuser"))
+                        {
+                            startat = arguments["logonuser"];
+                        }
+                        CreateScheduledTask(taskname, arguments["command"], runasuser, arguments["triggertype"], author, description, rep, attime, startat, logonuser);
                     }
-                    if (arguments.ContainsKey("command"))
-                    {
-                        command = arguments["command"];
-                    }
-                    WMIEventSub(eventname, command, attime, cleanup);
                 }
-            }
-            else if (arguments["action"].ToLower() == "getscheduledtaskcomhandler")
-            {
-                GetScheduledTaskComHandler();
-            }
-            else if (arguments["action"].ToLower() == "junctionfolder")
-            {
-                if (arguments.ContainsKey("cleanup") && !arguments.ContainsKey("guid"))
+                else if (arguments["action"].ToLower() == "listscheduledtasks")
                 {
-                    HowTo();
-                    return;
+                    ListScheduledTasks();
                 }
-                else if(!arguments.ContainsKey("dllpath") && !arguments.ContainsKey("cleanup"))
+                else if (arguments["action"].ToLower() == "scheduledtaskaction")
                 {
-                    HowTo();
-                    return;
-                }
-                else
-                {
+                    string sfolder = string.Empty;
+                    string actionid = string.Empty;
                     bool cleanup = false;
-                    string guid = null;
-                    string dllpath = null;
-                    if (arguments.ContainsKey("dllpath"))
+                    if (!arguments.ContainsKey("taskname") || !arguments.ContainsKey("command"))
                     {
-                        dllpath = arguments["dllpath"];
+                        HowTo();
+                        return;
                     }
-                    if (arguments.ContainsKey("cleanup"))
+                    else
                     {
-                        cleanup = true;
+                        string taskname = arguments["taskname"];
+                        string command = arguments["command"];
+                        if (arguments.ContainsKey("folder"))
+                        {
+                            sfolder = arguments["folder"];
+                        }
+                        if (arguments.ContainsKey("actionid"))
+                        {
+                            actionid = arguments["actionid"];
+                        }
+                        if (arguments.ContainsKey("cleanup"))
+                        {
+                            cleanup = true;
+                        }
+                        AddScheduledTaskAction(taskname, command, sfolder, actionid, cleanup);
                     }
-                    if (arguments.ContainsKey("guid"))
-                    {
-                        guid = arguments["guid"];
-                    }
-                    JunctionFolder(dllpath, cleanup, guid);
                 }
-            }
-            else if (arguments["action"].ToLower() == "startupdirectory")
-            {
+                else if (arguments["action"].ToLower() == "schtaskcomhijack")
+                {
+                    if (arguments.ContainsKey("cleanup") && !arguments.ContainsKey("clsid"))
+                    {
+                        HowTo();
+                        return;
+                    }
+                    if (!arguments.ContainsKey("clsid") || !arguments.ContainsKey("dllpath") && !arguments.ContainsKey("cleanup"))
+                    {
+                        HowTo();
+                        return;
+                    }
+                    else
+                    {
+                        string clsid = arguments["clsid"];
+                        string dllpath = string.Empty;
+                        bool cleanup = false;
+                        if (arguments.ContainsKey("dllpath"))
+                        {
+                            dllpath = arguments["dllpath"];
+                        }
+                        if (arguments.ContainsKey("cleanup"))
+                        {
+                            cleanup = true;
+                        }
+                        SchTskCOMHijack(clsid, dllpath, cleanup);
+                    }
+                }
+                else if (arguments["action"].ToLower() == "createservice")
+                {
+                    string servicename = "WinSvc32";
+                    if (arguments.ContainsKey("servicename"))
+                    {
+                        servicename = arguments["servicename"];
+                    }
 
-            }
-            else if (arguments["action"].ToLower() == "newlnk")
-            {
-                if (!arguments.ContainsKey("filepath") || !arguments.ContainsKey("lnkname") || !arguments.ContainsKey("lnktarget"))
-                {
-                    HowTo();
-                    return;
-                }
-                else
-                {
-                    string filepath = arguments["filepath"];
-                    string lnkname = arguments["lnkname"];
-                    string lnktarget = arguments["lnktarget"];
-                    string lnkicon = arguments["lnktarget"];
-                    if (arguments.ContainsKey("lnkicon"))
-                    {
-                        lnkicon = arguments["lnkicon"];
-                    }
-                    NewLnk(filepath, lnkname, lnktarget, lnkicon);
-                }
-            }
-            else if (arguments["action"].ToLower() == "backdoorlnk")
-            {
-                if (!arguments.ContainsKey("lnkpath") || !arguments.ContainsKey("command"))
-                {
-                    HowTo();
-                    return;
-                }
-                else
-                {
-                    bool cleanup = false;
-                    string lnkpath = arguments["lnkpath"];
-                    string command = arguments["command"];
                     if (arguments.ContainsKey("cleanup"))
                     {
-                        cleanup = true;
+                        DeleteService(servicename);
                     }
-                    BackDoorLNK(lnkpath, command, cleanup);
+                    else
+                    {
+                        if (!arguments.ContainsKey("command"))
+                        {
+                            HowTo();
+                            return;
+                        }
+                        string command = arguments["command"];
+                        CreateService(servicename, command);
+                    }
+
+                }
+                else if (arguments["action"].ToLower() == "listrunningservices")
+                {
+                    ListRunningServices();
+                }
+                else if (arguments["action"].ToLower() == "wmieventsub")
+                {
+                    string eventname = "WinEvent";
+                    string attime = "10:00";
+                    string command = "";
+                    bool cleanup = false;
+                    if (arguments.ContainsKey("cleanup") && !arguments.ContainsKey("eventname"))
+                    {
+                        HowTo();
+                        return;
+                    }
+                    else if (!arguments.ContainsKey("eventname") || !arguments.ContainsKey("command") && !arguments.ContainsKey("cleanup"))
+                    {
+                        HowTo();
+                        return;
+                    }
+                    else
+                    {
+                        if (arguments.ContainsKey("cleanup"))
+                        {
+                            cleanup = true;
+                        }
+                        if (arguments.ContainsKey("eventname"))
+                        {
+                            eventname = arguments["eventname"];
+                        }
+                        if (arguments.ContainsKey("attime"))
+                        {
+                            if (arguments["attime"] == "startup" || arguments["attime"].Contains(":"))
+                            {
+                                attime = arguments["attime"];
+                            }
+                            else
+                            {
+                                Console.WriteLine("[-] Invalid 'attime', accepts 'startup' or time as '10:00'");
+                                HowTo();
+                                return;
+                            }
+                        }
+                        if (arguments.ContainsKey("command"))
+                        {
+                            command = arguments["command"];
+                        }
+                        WMIEventSub(eventname, command, attime, cleanup);
+                    }
+                }
+                else if (arguments["action"].ToLower() == "getscheduledtaskcomhandler")
+                {
+                    GetScheduledTaskComHandler();
+                }
+                else if (arguments["action"].ToLower() == "junctionfolder")
+                {
+                    if (arguments.ContainsKey("cleanup") && !arguments.ContainsKey("guid"))
+                    {
+                        HowTo();
+                        return;
+                    }
+                    else if (!arguments.ContainsKey("dllpath") && !arguments.ContainsKey("cleanup"))
+                    {
+                        HowTo();
+                        return;
+                    }
+                    else
+                    {
+                        bool cleanup = false;
+                        string guid = null;
+                        string dllpath = null;
+                        if (arguments.ContainsKey("dllpath"))
+                        {
+                            dllpath = arguments["dllpath"];
+                        }
+                        if (arguments.ContainsKey("cleanup"))
+                        {
+                            cleanup = true;
+                        }
+                        if (arguments.ContainsKey("guid"))
+                        {
+                            guid = arguments["guid"];
+                        }
+                        JunctionFolder(dllpath, cleanup, guid);
+                    }
+                }
+                else if (arguments["action"].ToLower() == "startupdirectory")
+                {
+
+                }
+                else if (arguments["action"].ToLower() == "newlnk")
+                {
+                    if (!arguments.ContainsKey("filepath") || !arguments.ContainsKey("lnkname") || !arguments.ContainsKey("lnktarget"))
+                    {
+                        HowTo();
+                        return;
+                    }
+                    else
+                    {
+                        string filepath = arguments["filepath"];
+                        string lnkname = arguments["lnkname"];
+                        string lnktarget = arguments["lnktarget"];
+                        string lnkicon = arguments["lnktarget"];
+                        if (arguments.ContainsKey("lnkicon"))
+                        {
+                            lnkicon = arguments["lnkicon"];
+                        }
+                        NewLnk(filepath, lnkname, lnktarget, lnkicon);
+                    }
+                }
+                else if (arguments["action"].ToLower() == "backdoorlnk")
+                {
+                    if (!arguments.ContainsKey("lnkpath") || !arguments.ContainsKey("command"))
+                    {
+                        HowTo();
+                        return;
+                    }
+                    else
+                    {
+                        bool cleanup = false;
+                        string lnkpath = arguments["lnkpath"];
+                        string command = arguments["command"];
+                        if (arguments.ContainsKey("cleanup"))
+                        {
+                            cleanup = true;
+                        }
+                        BackDoorLNK(lnkpath, command, cleanup);
+                    }
+                }
+                else if (arguments["action"].ToLower() == "listtasknames")
+                {
+                    ListTaskNames();
+                }
+                else
+                {
+                    HowTo();
+                    return;
                 }
             }
-            else if (arguments["action"].ToLower() == "listtasknames")
+            catch (Exception e)
             {
-                ListTaskNames();
-            }
-            else
-            {
-                HowTo();
-                return;
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
             }
         }
 
