@@ -916,7 +916,7 @@ namespace SharpStay
             //Drop file in Windows startup directory
         }
 
-        static void NewLnk(string filepath, string lnkname, string lnktarget, string lnkicon)
+        static void NewLnk(string filepath, string lnkname, string lnktarget, string lnkicon, string lnkarguments = null)
         {
             if (!System.IO.Directory.Exists(filepath))
             {
@@ -927,19 +927,24 @@ namespace SharpStay
             WshShell wshell = new WshShell();
             IWshShortcut lnk = (IWshShortcut)wshell.CreateShortcut(lnklocation);
 
-            List<string> retcmd = ParseCommand(lnktarget);
-            string Directory = retcmd[0];
-            string Binary = retcmd[1];
-            string Parameters = retcmd[2];
-            string uptp = String.Format("{0}\\{1}", Directory, Binary);
+            //List<string> retcmd = ParseCommand(lnktarget);
+            //string Directory = retcmd[0];
+            //string Binary = retcmd[1];
+            //string Parameters = retcmd[2];
+            //string uptp = String.Format("{0}\\{1}", Directory, Binary);
             string upic = String.Format("{0},0", lnkicon);
-            lnk.TargetPath = uptp;
-            lnk.Arguments = Parameters;
+            //lnk.TargetPath = uptp;
+            lnk.TargetPath = lnktarget;
+            //lnk.Arguments = Parameters;
+            if(lnkarguments != null)
+            {
+                lnk.Arguments = lnkarguments;
+            }
             lnk.WorkingDirectory = filepath;
             lnk.IconLocation = upic;
             lnk.WindowStyle = 7;
             lnk.Save();
-            Console.WriteLine("[+] Created {0} to run {1}", lnklocation, lnktarget);
+            Console.WriteLine("[+] Created {0} to run {1} {2}", lnklocation, lnktarget, lnkarguments);
         }
 
         static void BackDoorLNK(string lnkpath, string command, bool cleanup = false)
@@ -1052,7 +1057,7 @@ namespace SharpStay
                         casplit[0] = cmdpath.Substring(slh);
                         casplit[0] = casplit[0].Replace("\\", "");
                         casplit[1] = cmdarg;
-			cmdpath = cmdpath.Replace("\\" + casplit[0], "");
+			            cmdpath = cmdpath.Replace("\\" + casplit[0], "");
                     }
                     else
                     {
@@ -1304,7 +1309,7 @@ namespace SharpStay
                     }
                     if (arguments.ContainsKey("logonuser"))
                     {
-                        startat = arguments["logonuser"];
+                        logonuser = arguments["logonuser"];
                     }
                     CreateScheduledTask(taskname, arguments["command"], runasuser, arguments["triggertype"], author, description, rep, attime, startat, logonuser);
                 }
@@ -1493,15 +1498,21 @@ namespace SharpStay
                 }
                 else
                 {
+                    string lnkarguments = null;
                     string filepath = arguments["filepath"];
                     string lnkname = arguments["lnkname"];
                     string lnktarget = arguments["lnktarget"];
                     string lnkicon = arguments["lnktarget"];
+                    
                     if (arguments.ContainsKey("lnkicon"))
                     {
                         lnkicon = arguments["lnkicon"];
                     }
-                    NewLnk(filepath, lnkname, lnktarget, lnkicon);
+                    if (arguments.ContainsKey("lnkarguments"))
+                    {
+                        lnkarguments = arguments["lnkarguments"];
+                    }
+                    NewLnk(filepath, lnkname, lnktarget, lnkicon, lnkarguments);
                 }
             }
             else if (arguments["action"].ToLower() == "backdoorlnk")
